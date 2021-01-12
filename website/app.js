@@ -13,6 +13,10 @@ let newDate = d.getMonth() + 1 +'.'+ d.getDate()+'.'+ d.getFullYear();
 
 //error element 
 const error = document.getElementById('error');
+//entry holder elements
+const temp = document.getElementById('temp');
+const data = document.getElementById('data');
+const content = document.getElementById('content');
 
 /* main code (click event) */
 
@@ -28,26 +32,23 @@ btn.addEventListener('click', () => {
     if(input.zip === '') {
         error.innerHTML = 'Please enter a ZIP code';
         return;
-    }
-        
+    }        
     /* get the weather data form OWM api */
     getTemprature(input.zip)
-        .then(temprature => postData(temprature))
-        .then(resData => getData());
-        
-    
     /* post data to the server to save it */
-
+        .then(resData => {
+            if(! resData) {
+                return;
+            }
+            postData(resData.main.temp)
+        })
     /* get the project data form the server */
-
+        .then(resData => getData())
     /* update the UI */
-
+        .then(projectData => updateUi(projectData));
 });
 
-//zip: 94040
-
 /* functions */
-
 /**
  * get the value of the zip and feelings inputs
  * @returns {Object} object containing the zip and feelings values
@@ -59,10 +60,17 @@ const getInput = () => {
     }
 };
 
-
+/**
+ * update the entry holder elemnts
+ * @param {Object} projectData 
+ */
+const updateUi = projectData => {
+    temp.innerHTML = projectData.tempratures[0] || '';
+    date.innerHTML = projectData.dates[0] || '';
+    content.innerHTML = projectData.userResponses[0] || '';
+}
 
 /* async functions */
-
 /**
  * get the temprature associated with the zip code
  * @param {String} zip the zip code of a city
@@ -74,31 +82,31 @@ const getTemprature = async zip => {
 
     //fetch the api response
     const response = await fetch(url);
-
     try {
         const data = await response.json();
-
         if(data.cod !== 200) {
             error.innerHTML = 'Invalid ZIP code';
             throw 'Invalid ZIP code';
         }
-
-        return data.main.temp;
+        return data;
     } catch (error) {
         console.log(error);
     }
 };
 
-
+/**
+ * post data to the server to be saved
+ * @param {Number} temprature 
+ * @returns {Object} an object indecate success {status: 'success'}
+ */
 const postData = async temprature => {
     //get the feelings input 
     const feelings = document.getElementById('feelings').value;
-    
     //data object that will be passed in the post request's body
     const data = {
         temprature,
-        date, newDate,
-        userResponse, feelings
+        date: newDate,
+        userResponse: feelings
     };
 
     const response = await fetch('/add', {
@@ -116,8 +124,18 @@ const postData = async temprature => {
     } catch (error) {
         console.log(error);
     }
+};
 
-}
-
-
+/**
+ * get the project data form the /all route
+ * @returns {Object} projectData containg all the data
+ */
+const getData = async () => {
+    const response = await fetch('/all');
+    try {
+        return await response.json(); 
+    } catch (error) {
+        console.log(error);
+    }
+};
  
