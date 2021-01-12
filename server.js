@@ -1,9 +1,5 @@
 // Setup empty JS object to act as endpoint for all routes
-let projectData = {
-    tempratures: [],
-    dates: [],
-    userResponses: []
-};
+let projectData = {};
 
 // Require Express to run server and routes
 const express = require('express');
@@ -29,9 +25,9 @@ app.get('/all', (req, res) => res.send(projectData));
 
 //add a new data record to the projectData
 app.post('/add', (req, res) => {
-    projectData.tempratures.unshift(req.body.temprature);
-    projectData.dates.unshift(req.body.date);
-    projectData.userResponses.unshift(req.body.userResponse);
+    projectData.temprature = req.body.temprature;
+    projectData.date = req.body.date;
+    projectData.userResponse = req.body.userResponse;
     res.send({status: 'success'});
 });
 

@@ -65,9 +65,9 @@ const getInput = () => {
  * @param {Object} projectData 
  */
 const updateUi = projectData => {
-    temp.innerHTML = projectData.tempratures[0] || '';
-    date.innerHTML = projectData.dates[0] || '';
-    content.innerHTML = projectData.userResponses[0] || '';
+    temp.innerHTML = projectData.temprature ? temp.innerHTML = 'Temprature: ' + projectData.temprature + 'C' : '';  
+    date.innerHTML = projectData.date ? date.innerHTML = 'Date: ' + projectData.date : '';  
+    content.innerHTML = projectData.userResponse ? content.innerHTML = 'Feelings: ' + projectData.userResponse : '';  
 }
 
 /* async functions */
