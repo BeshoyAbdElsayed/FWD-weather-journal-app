@@ -11,13 +11,13 @@ let d = new Date();
 //as getMonth() method starts counting from 0 we will add 1
 let newDate = d.getMonth() + 1 +'.'+ d.getDate()+'.'+ d.getFullYear();
 
-//error variable
+//error element 
 const error = document.getElementById('error');
 
-/* main code */
-//get the generate button 
+/* main code (click event) */
+
+//add click event listener on the generate button
 const btn = document.getElementById('generate');
-//add click event listener on the button
 btn.addEventListener('click', () => {
     //clear error element
     error.innerHTML = '';
@@ -32,8 +32,8 @@ btn.addEventListener('click', () => {
         
     /* get the weather data form OWM api */
     getTemprature(input.zip)
-        .then(data => console.log(data))
-        // .then(temprature => postData(temprature));
+        .then(temprature => postData(temprature))
+        .then(resData => getData());
         
     
     /* post data to the server to save it */
@@ -61,10 +61,6 @@ const getInput = () => {
 
 
 
-
-
-
-
 /* async functions */
 
 /**
@@ -73,7 +69,7 @@ const getInput = () => {
  * @returns {Number} temprature in Celsius 
  */
 const getTemprature = async zip => {
-    //construct the url
+    //construct the api url
     const url = `http://api.openweathermap.org/data/2.5/weather?zip=${zip}&appid=${apiKey}&units=${units}`;
 
     //fetch the api response
@@ -94,7 +90,34 @@ const getTemprature = async zip => {
 };
 
 
-// const postData = ()
+const postData = async temprature => {
+    //get the feelings input 
+    const feelings = document.getElementById('feelings').value;
+    
+    //data object that will be passed in the post request's body
+    const data = {
+        temprature,
+        date, newDate,
+        userResponse, feelings
+    };
+
+    const response = await fetch('/add', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+
+    try {
+        const resData = await response.json();
+        return resData;
+    } catch (error) {
+        console.log(error);
+    }
+
+}
 
 
  
